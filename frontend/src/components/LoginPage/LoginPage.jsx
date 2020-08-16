@@ -2,10 +2,15 @@ import React, { useReducer, useState } from 'react';
 import { login, signUp } from '../../api/requests';
 import './LoginPage.scss';
 
-const LoginPage = () => {
-    const [hasAccount, changeHasAccount] = useReducer(hasAccount => !hasAccount, true);
-    const [fields, setFields] = useState({ login: '', password: ''});
+const LoginPage = ({ setToken }) => {
+    const initialFields = { login: '', password: '' };
+    const [fields, setFields] = useState(initialFields);
     const [error, setError] = useState();
+    const [hasAccount, changeHasAccount] = useReducer(hasAccount => { 
+        setFields(initialFields);
+        setError(null);
+        return !hasAccount;
+    }, true);
 
     const handleChange = event => {
         event.persist();
@@ -16,16 +21,18 @@ const LoginPage = () => {
     };
 
     const handleButtonClick = () => {
+        if(fields.login === '' || fields.password === '') {
+            setError('Fill the fields!');
+            return;
+        }
         if(hasAccount) {
-            if(fields.login === '' || fields.password === '') {
-                setError('Fill the fields!');
-            } else {
-                login(fields.login, fields.password)
-                .then(data => console.log(data))
-                .catch(() => setError('Invalid login or password. Try again!'))
-            }
+            login(fields.login, fields.password)
+            .then(data => setToken(data.token))
+            .catch(() => setError('Invalid login or password. Try again!'));
         } else {
-            console.log(signUp);
+            signUp(fields.login, fields.password)
+            .then(changeHasAccount)
+            .catch(() => setError('Login is already taken!'));
         }
     };
 
@@ -50,7 +57,6 @@ const LoginPage = () => {
                     name="password"
                     className="login-dialog-input"
                     id="password-input"
-                    type="password"
                     value={fields.password}
                     onChange={handleChange}
                 />

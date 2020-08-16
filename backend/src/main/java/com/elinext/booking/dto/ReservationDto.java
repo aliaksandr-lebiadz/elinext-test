@@ -20,6 +20,5 @@ public class ReservationDto {
     private LocalDateTime endDate;
     private boolean canceled;
     private long roomId;
-    private long userId;
 
 }

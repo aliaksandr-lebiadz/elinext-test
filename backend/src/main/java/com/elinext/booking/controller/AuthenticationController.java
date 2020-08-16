@@ -27,7 +27,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/sign-up")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void signUp(@Valid @RequestBody AuthenticationRequestDto requestDto) throws ServiceException {
         userService.signUp(requestDto.getUsername(), requestDto.getPassword());
     }

@@ -17,10 +17,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @RequiredArgsConstructor(onConstructor_={@Lazy})
 public class UserServiceImpl implements UserService {
+
+    private static final Lock LOCK = new ReentrantLock();
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -29,13 +33,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void signUp(String username, String password) throws ServiceException {
-        Optional<User> optionalUser = userRepository.findByUsername(username);
-        if(optionalUser.isPresent()) {
-            throw new EntityAlreadyExistsException("User with username " + username + " already exists!");
+        LOCK.lock();
+        try{
+            Optional<User> optionalUser = userRepository.findByUsername(username);
+            if(optionalUser.isPresent()) {
+                throw new EntityAlreadyExistsException("User with username " + username + " already exists!");
+            }
+            String encodedPassword = passwordEncoder.encode(password);
+            User user = new User(username, encodedPassword);
+            userRepository.save(user);
+        } finally {
+            LOCK.unlock();
         }
-        String encodedPassword = passwordEncoder.encode(password);
-        User user = new User(username, encodedPassword);
-        userRepository.save(user);
     }
 
     @Override

@@ -14,11 +14,18 @@ import com.elinext.booking.repository.UserRepository;
 import com.elinext.booking.service.api.ReservationService;
 import com.elinext.booking.validator.ReservationValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @RequiredArgsConstructor
 public class ReservationServiceImpl implements ReservationService {
+
+    private static final Lock LOCK = new ReentrantLock();
 
     private final ReservationRepository reservationRepository;
     private final RoomRepository roomRepository;
@@ -28,20 +35,28 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public ReservationDto add(ReservationDto reservationDto) throws ServiceException {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+        String username = userDetails.getUsername();
         long roomId = reservationDto.getRoomId();
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new EntityNotFoundException("Room with id " + roomId + " not found!"));
-        long userId = reservationDto.getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " not found!"));
         Reservation reservation = reservationMapper.mapToEntity(reservationDto);
-        reservation.setRoom(room);
-        reservation.setUser(user);
-        if(!reservationValidator.isValid(reservation)) {
-            throw new ValidationException("Reservation dates are intersected!");
+        LOCK.lock();
+        try{
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new EntityNotFoundException("User with username " + username + " not found!"));
+            reservation.setUser(user);
+            Room room = roomRepository.findById(roomId)
+                    .orElseThrow(() -> new EntityNotFoundException("Room with id " + roomId + " not found!"));
+            reservation.setRoom(room);
+            if(!reservationValidator.isValid(reservation)) {
+                throw new ValidationException("Reservation dates are intersected!");
+            }
+            Reservation savedReservation = reservationRepository.save(reservation);
+            return reservationMapper.mapToDto(reservation);
+        } finally {
+            LOCK.unlock();
         }
-        Reservation savedReservation = reservationRepository.save(reservation);
-        return reservationMapper.mapToDto(reservation);
     }
 
     @Override

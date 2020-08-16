@@ -20,7 +20,6 @@ public class ReservationMapper {
         }
         ReservationDto dto = modelMapper.map(entity, ReservationDto.class);
         dto.setRoomId(entity.getRoom().getId());
-        dto.setUserId(entity.getUser().getId());
         return dto;
     }
     
