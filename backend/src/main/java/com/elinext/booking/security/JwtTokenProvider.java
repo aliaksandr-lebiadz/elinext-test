@@ -80,14 +80,6 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, "", Collections.emptyList());
     }
 
-    /* package-private */ String getUsername(String token) {
-        return Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
-
     /* package-private */ boolean isTokenValid(String token) {
         try{
             Jws<Claims> claims = Jwts.parser()
@@ -100,6 +92,14 @@ public class JwtTokenProvider {
         } catch (JwtException | IllegalArgumentException e) {
             throw new JwtAuthenticationException("JWT token is expired or invalid");
         }
+    }
+
+    private String getUsername(String token) {
+        return Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
 }

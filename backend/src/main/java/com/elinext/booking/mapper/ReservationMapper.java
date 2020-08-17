@@ -6,8 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
-
 @Component
 @RequiredArgsConstructor
 public class ReservationMapper {
@@ -15,7 +13,7 @@ public class ReservationMapper {
     private final ModelMapper modelMapper;
     
     public ReservationDto mapToDto(Reservation entity) {
-        if(Objects.isNull(entity)) {
+        if(entity == null) {
             return null;
         }
         ReservationDto dto = modelMapper.map(entity, ReservationDto.class);
@@ -24,6 +22,6 @@ public class ReservationMapper {
     }
     
     public Reservation mapToEntity(ReservationDto dto) {
-        return Objects.nonNull(dto) ? modelMapper.map(dto, Reservation.class) : null;
+        return dto != null ? modelMapper.map(dto, Reservation.class) : null;
     }
 }

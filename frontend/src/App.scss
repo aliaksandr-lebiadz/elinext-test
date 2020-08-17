@@ -1,3 +1,34 @@
 body {
   background: url('../src/images/background.jpg');
+  margin: 0;
+  overflow: hidden;
+}
+
+.dialog {
+  font-family: 'Open Sans', sans-serif;
+  position: relative;
+  width: 350px;
+  background: #ffffff;
+  border-radius: 3px;
+  box-shadow: 0 4px 8px black;
+}
+
+.dialog-header {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.dialog-button {
+  display: block;
+  cursor: pointer;
+  height: 30px;
+  border-radius: 2px;
+  border-width: 0;
+  color: white;
+  background-color: #324bad;
+  outline: none;
 }

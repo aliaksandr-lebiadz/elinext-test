@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +32,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public List<RoomResponseDto> getRoomsByType(RoomType type) {
-        List<Room> rooms = Objects.nonNull(type)
+        List<Room> rooms = type != null
                 ? roomRepository.findByType(type)
                 : roomRepository.findAll();
         return rooms.stream()
@@ -44,7 +43,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public RoomResponseDto add(RoomRequestDto roomDto) throws ServiceException {
         Room room = roomMapper.mapToEntity(roomDto);
-        if(Objects.isNull(room.getType())) {
+        if(room.getType() == null) {
             throw new EntityNotFoundException("Room type " + roomDto.getTypeValue() + " doesn't exist!");
         }
         Room savedRoom = roomRepository.save(room);

@@ -37,11 +37,11 @@ const LoginPage = ({ setToken }) => {
     };
 
     return (
-        <div className="login-dialog">
-            <div className="login-dialog-header">
+        <div className="dialog" id="login-dialog">
+            <div className="dialog-header">
                 {hasAccount ? 'Login to your account' : 'Create new account'}
             </div>
-            <div className="login-dialog-body">
+            <div className="dialog-body" id="login-dialog-body">
                 <label htmlFor="login-input">Login</label>
                 <input
                     type="text"
@@ -61,7 +61,13 @@ const LoginPage = ({ setToken }) => {
                     onChange={handleChange}
                 />
                 <div className="login-dialog-error">{error}</div>
-                <input className="login-dialog-button" type="button" value={hasAccount ? 'Login' : 'Sign up'} onClick={handleButtonClick}/>
+                <input
+                    className="dialog-button"
+                    id="login-dialog-button"
+                    type="button"
+                    value={hasAccount ? 'Login' : 'Sign up'}
+                    onClick={handleButtonClick}
+                />
             </div>
             <div className="sign-up-hint">
                 {hasAccount ? `Don't have an account?` : 'Already have an account?'}
